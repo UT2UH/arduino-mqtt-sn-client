@@ -89,10 +89,9 @@ public:
             device_address receive_address;
             memset(&receive_address, 0x0, sizeof(device_address));
 
-            uint8_t receive_buffer[RH_MAX_MESSAGE_LEN];
-            memset(&receive_buffer, 0x0, RH_MAX_MESSAGE_LEN);
-
-            uint8_t receive_buffer_len = sizeof(receive_buffer);
+            uint8_t* receive_buffer = (uint8_t*)malloc(RH_MAX_MESSAGE_LEN);
+            memset(receive_buffer, 0x0, RH_MAX_MESSAGE_LEN);
+            uint8_t receive_buffer_len = RH_MAX_MESSAGE_LEN;
 
             if (receive(&receive_address, receive_buffer, receive_buffer_len)) {
 
@@ -105,6 +104,8 @@ public:
                 }
 
             }
+
+            free(receive_buffer);
         }
 
         return true;
