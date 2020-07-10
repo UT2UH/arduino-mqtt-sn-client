@@ -65,7 +65,6 @@ public:
             case MQTTSN_REGACK:
                 parse_regack(address, bytes);
             case MQTTSN_PUBLISH:
-                Serial.println("MQTTSN_PUBLISH");
                 parse_publish(address, bytes);
                 break;
             default:
