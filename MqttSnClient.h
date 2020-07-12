@@ -110,23 +110,29 @@ public:
 
         socket_disconnected = false;
         memcpy(&this->gw_address, address, sizeof(device_address));
+        int gwa = this->gw_address.bytes[0];
 
         for (uint8_t tries = 0; tries < retries; tries++) {
             system.set_heartbeat(timeout * 1000);
+            printf("\n    send_connect(to %d) try %d\n", gwa, tries);            
             mqttSnMessageHandler.send_connect(address, client_id, duration);
+            printf("    waiting for MQTTSN CONNACK...\n");            
             this->set_await_message(MQTTSN_CONNACK);
             while (!mqttsn_connected) {
                 socketInterface.loop();
                 if (mqttsn_connected) {
                     memcpy(&this->gw_address, address, sizeof(device_address));
                     system.set_heartbeat(duration * 1000);
+                    printf("Mqttsn connected on try %d\n", tries);
                     return true;
                 }
                 if (system.has_beaten()) {
                     // timeout
+                    printf("connect to %d timed out on try %d\n", gwa, tries);
                     break;
                 }
                 if (socket_disconnected) {
+                    printf("connect to %d failed = socket disconnected on try %d\n", gwa, tries);
                     return false;
                 }
             }
