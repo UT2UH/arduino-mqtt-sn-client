@@ -36,7 +36,7 @@ enum TransmissionProtocolUartBridgeStatus {
     RECEIVE,
     CONFIGURATION,
     PARSE_FAILURE,
-    ERROR
+    SN_ERROR
 };
 
 enum SEND_STATUS {
@@ -106,7 +106,7 @@ public:
         memset(serialBuffer, 0x0, sizeof(serialBuffer));
         socketInterface.setTransmissionProtocolUartBridge(this);
         if (!socketInterface.begin()) {
-            status = ERROR;
+            status = SN_ERROR;
             return false;
         }
         status = IDLE;
@@ -174,7 +174,7 @@ public:
     }
 
     void notify_socket_disconnected() {
-        status == ERROR;
+        status == SN_ERROR;
     }
 
     void resetChip() {
@@ -188,7 +188,7 @@ public:
         asm volatile ("  jmp 0");
 #else
 #warning "resetChip() is not properly implemented. This means we cannot reset the TransmissionProtocolUartBridge."
-        stream->print(F("ERROR RESET_NOT_SUPPORTED\n"));
+        stream->print(F("SN_ERROR RESET_NOT_SUPPORTED\n"));
 #endif
     }
 
@@ -207,7 +207,7 @@ public:
 
         if (status == STARTING) {
             // begin should be already called
-            stream->print(F("ERROR NOT_STARTED\n"));
+            stream->print(F("SN_ERROR NOT_STARTED\n"));
             return false;
         }
 
@@ -262,7 +262,7 @@ public:
                     send_status = SEND_NONE;
                     status = IDLE;
                 } else {
-                    status = ERROR;
+                    status = SN_ERROR;
                 }
             }
         }
@@ -276,7 +276,7 @@ public:
                     stream->print(F("OK SEND_DATA\n"));
                     receive_status = SEND_DATA;
                 } else {
-                    status = ERROR;
+                    status = SN_ERROR;
                 }
             } else if (receive_status == SEND_DATA) {
                 if (send_receive_data()) {
@@ -285,7 +285,7 @@ public:
                     receive_status = RECEIVE_NONE;
                     status = IDLE;
                 } else {
-                    status = ERROR;
+                    status = SN_ERROR;
                 }
             }
         }
@@ -299,28 +299,28 @@ public:
                     stream->print(F("OK SEND_OWN_ADDRESS\n"));
                     configuration_status = CONFIGURATION_OWN_ADDRESS;
                 } else {
-                    status = ERROR;
+                    status = SN_ERROR;
                 }
             } else if (configuration_status == CONFIGURATION_OWN_ADDRESS) {
                 if (printOwnAddress()) {
                     stream->print(F("OK SEND_BROADCAST_ADDRESS\n"));
                     configuration_status = CONFIGURATION_BROADCAST_ADDRESS;
                 } else {
-                    status = ERROR;
+                    status = SN_ERROR;
                 }
             } else if (configuration_status == CONFIGURATION_BROADCAST_ADDRESS) {
                 if (printBroadcastAddress()) {
                     stream->print(F("OK SEND_MAXIMUM_MESSAGE_LENGTH\n"));
                     configuration_status = CONFIGURATION_MAXIMUM_MESSAGE_LENGTH;
                 } else {
-                    status = ERROR;
+                    status = SN_ERROR;
                 }
             } else if (configuration_status == CONFIGURATION_MAXIMUM_MESSAGE_LENGTH) {
                 if (printMaximumMessageLength()) {
                     stream->print(F("OK SEND_SERIAL_BUFFER_SIZE\n"));
                     configuration_status = CONFIGURATION_SERIAL_BUFFER_SIZE;
                 } else {
-                    status = ERROR;
+                    status = SN_ERROR;
                 }
             } else if (configuration_status == CONFIGURATION_SERIAL_BUFFER_SIZE) {
                 if (printSerialBufferSize()) {
@@ -328,7 +328,7 @@ public:
                     configuration_status = CONFIGURATION_NONE;
                     status = IDLE;
                 } else {
-                    status = ERROR;
+                    status = SN_ERROR;
                 }
             }
         }
@@ -349,8 +349,8 @@ public:
             status = STARTING;
         }
         */
-        if (status == ERROR) {
-            stream->print(F("ERROR\n"));
+        if (status == SN_ERROR) {
+            stream->print(F("SN_ERROR\n"));
             resetSerialBuffer();
             resetChip();
         }
@@ -370,8 +370,8 @@ public:
             stream->print(F("CONFIGURATION"));
         } else if (status == PARSE_FAILURE) {
             stream->print(F("PARSE_FAILURE"));
-        } else if (status == ERROR) {
-            stream->print(F("ERROR"));
+        } else if (status == SN_ERROR) {
+            stream->print(F("SN_ERROR"));
         } else {
             stream->print(F("\n"));
             return false;
@@ -456,7 +456,7 @@ public:
     }
 
     bool send_error() {
-        stream->print(F("ERROR\n"));
+        stream->print(F("SN_ERROR\n"));
         return true;
     }
 
