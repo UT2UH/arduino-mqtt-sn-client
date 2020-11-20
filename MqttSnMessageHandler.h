@@ -202,14 +202,14 @@ public:
 
     void parse_regack(device_address *pAddress, uint8_t *bytes) {
         msg_regack* msg = (msg_regack *) bytes;
-        if(bytes[0] == 7 & bytes[1] == MQTTSN_REGACK){
+        if((bytes[0] == 7) && (bytes[1] == MQTTSN_REGACK)){
             mqttSnClient.handle_regack(msg->topic_id, msg->message_id, msg->return_code);
         }
     }
 
     void parse_publish(device_address *address, uint8_t *bytes) {
         msg_publish *msg = (msg_publish *) bytes;
-        if (bytes[0] > 7 && bytes[1] == MQTTSN_PUBLISH) { // 7 bytes header + at least 1 byte data
+        if ((bytes[0] > 7) && (bytes[1] == MQTTSN_PUBLISH)) { // 7 bytes header + at least 1 byte data
             bool dup = (msg->flags & FLAG_DUP) != 0;
 
             int8_t qos = 0;
@@ -226,7 +226,7 @@ public:
             bool retain = (msg->flags & FLAG_RETAIN) != 0;
             bool short_topic = (msg->flags & FLAG_TOPIC_SHORT_NAME) != 0;
             uint16_t data_len = bytes[0] - (uint8_t) 7;
-            if (((qos == 0) || (qos == -1)) && msg->message_id != 0x0000) {
+            if (((qos == 0) || (qos == -1)) && (msg->message_id != 0x0000)) {
                 // this can be too strict
                 // we can also ignore the message_id for Qos 0 and -1
                 return;
